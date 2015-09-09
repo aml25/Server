@@ -36,6 +36,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 function setHostEnvironment(newHost){
 	var host = newHost == "localhost" ? staticHost : host;
+	console.log(host + ": " + new Date());
 	return host;
 }
 
