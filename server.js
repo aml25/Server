@@ -9,7 +9,9 @@ var io = require('socket.io')(server);
 var url = require("url");
 var path = require('path');
 var TuneFarm = require('TuneFarm.js');
-var TuneFarm = new TuneFarm();
+TuneFarm = new TuneFarm();
+var GrossNinja = require('GrossNinja.js');
+GrossNinja = new GrossNinja();
 /*** ============================== ***/
 
 var host;
@@ -33,15 +35,21 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 //app.use(express.static(__dirname + '/public'));
 
 function setHostEnvironment(newHost){
-	host = newHost == "localhost" ? staticHost : host;
+	var host = newHost == "localhost" ? staticHost : host;
+	return host;
 }
 
 
 app.get("/", function(req, res){
 	//set the host environment when a user visits the website
 	host = setHostEnvironment(req.headers.host);
-	if(host == "tune.farm"){
-		TuneFarm.visit(req,res);
+	switch(host){
+		case "tune.farm":
+			TuneFarm.visit(req,res);
+			break;
+		case "gross.ninja":
+			GrossNinja.visit(req,res);
+			break;
 	}
 });
 
