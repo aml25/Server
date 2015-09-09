@@ -12,6 +12,9 @@ var TuneFarm = require('TuneFarm.js');
 var TuneFarm = new TuneFarm();
 /*** ============================== ***/
 
+var host;
+var staticHost = "tune.farm";
+
 //config for username and password
 //var messages = JSON.parse(fs.readFileSync("wall.json"));
 
@@ -29,10 +32,17 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 //serve a folder called "public," which contains all the data to be served to clients
 //app.use(express.static(__dirname + '/public'));
 
+function setHostEnvironment(newHost){
+	host = newHost == "localhost" ? staticHost : host;
+}
+
 
 app.get("/", function(req, res){
-	var host = req.headers.host;
-	console.log(host);
+	//set the host environment when a user visits the website
+	host = setHostEnvironment(req.headers.host);
+	if(host == "tune.farm"){
+		TuneFarm.visit(req,res);
+	}
 });
 
 
