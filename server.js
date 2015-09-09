@@ -35,7 +35,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 //app.use(express.static(__dirname + '/public'));
 
 function setHostEnvironment(newHost){
-	var host = newHost == "localhost" ? staticHost : host;
+	var host = newHost == "localhost" ? staticHost : newHost;
 	console.log(host + ": " + new Date());
 	return host;
 }
