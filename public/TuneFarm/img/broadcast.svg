@@ -3,6 +3,10 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
 <g>
-	<polygon points="7.2,50 7.2,0 50.5,25 93.9,50 50.5,75 7.2,100 	"/>
+	<polygon points="50,100 9.9,100 29.9,65.2 50,30.5 70.1,65.2 90.1,100 	"/>
+</g>
+<g>
+	<path d="M50,4c23.7,0,42.9,19.3,42.9,42.9S73.7,89.8,50,89.8S7.1,70.6,7.1,46.9S26.3,4,50,4 M50,0C24.1,0,3.1,21,3.1,46.9
+		s21,46.9,46.9,46.9s46.9-21,46.9-46.9S75.9,0,50,0L50,0z"/>
 </g>
 </svg>
