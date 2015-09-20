@@ -96,6 +96,11 @@
 			margin:8px;
 		}
 
+		#playlist-button-img{
+			width:1rem;
+			height:1rem;
+		}
+
 
 	</style>
 </head>
@@ -116,6 +121,7 @@
 	</div>
 
 	<div id="playlist-button" class="button-circle fixed"></div>
+	<img id="playlist-button-img" src="img/playlist-01.png">
 
 	<!--<ul>
 		<li>browse</li>
@@ -184,6 +190,13 @@
 		new Tether({
 			element: $("#play-button-img"),
 			target: $("#play-button"),
+			attachment: "middle center",
+			targetAttachment: "middle center"
+		})
+
+		new Tether({
+			element: $("#playlist-button-img"),
+			target: $("#playlist-button"),
 			attachment: "middle center",
 			targetAttachment: "middle center"
 		})
