@@ -58,13 +58,13 @@
 			margin:8px;
 		}
 
-		.dropShadow{
+		/*.dropShadow{
 			box-shadow: 2px 6px 15px #111;
 		}
 
 		.textShadow{
 			text-shadow: 0px 4px 8px #111;
-		}
+		}*/
 
 		#playbar{
 			left:0;
@@ -85,20 +85,24 @@
 			background-color: #70E852 !important;
 		}
 
-		#play-button-img{
-			width:1rem;
-			height: 1rem;
-		}
-
 		#playlist-button{
 			bottom:0;
 			right:0;
 			margin:8px;
 		}
 
-		#playlist-button-img{
+		.smallImg{
 			width:1rem;
 			height:1rem;
+		}
+
+		.largeImg{
+			width:1.4rem;
+			height:1.4rem;
+		}
+
+		img{
+			image-rendering: auto;
 		}
 
 
@@ -108,20 +112,23 @@
 	<div id="logo" class="fixed textShadow">Tune Farm</div>
 
 	<div id="menu" class="fixed">
-		<div class="button-circle dropShadow"></div>
-		<div class="button-circle dropShadow"></div>
-		<div class="button-circle dropShadow"></div>
+		<div id="browse-button" class="button-circle dropShadow"></div>
+		<img id="browse-button-img" class="largeImg" src="img/browse.svg">
+		<div id="broadcast-button" class="button-circle dropShadow"></div>
+		<img id="broadcast-button-img" class="largeImg" src="img/broadcast.svg">
+		<div id="settings-button" class="button-circle dropShadow"></div>
+		<img id="settings-button-img" class="largeImg" src="img/settings.svg">
 	</div>
 
 	<div id="playbar" class="fixed">
 		<div id="play-button" class="button-circle">
 		</div>
-		<img id="play-button-img" src="img/play-01.png">
+		<img id="play-button-img" class="smallImg" src="img/play.svg">
 		<div id="timeline" class="absolute"></div>
 	</div>
 
 	<div id="playlist-button" class="button-circle fixed"></div>
-	<img id="playlist-button-img" src="img/playlist-01.png">
+	<img id="playlist-button-img" class="largeImg" src="img/playlist.svg">
 
 	<!--<ul>
 		<li>browse</li>
@@ -194,9 +201,34 @@
 			targetAttachment: "middle center"
 		})
 
+		//playlist
 		new Tether({
 			element: $("#playlist-button-img"),
 			target: $("#playlist-button"),
+			attachment: "middle center",
+			targetAttachment: "middle center"
+		})
+
+		//browse
+		new Tether({
+			element: $("#browse-button-img"),
+			target: $("#browse-button"),
+			attachment: "middle center",
+			targetAttachment: "middle center"
+		})
+
+		//broadcast
+		new Tether({
+			element: $("#broadcast-button-img"),
+			target: $("#broadcast-button"),
+			attachment: "middle center",
+			targetAttachment: "middle center"
+		})
+
+		//settings
+		new Tether({
+			element: $("#settings-button-img"),
+			target: $("#settings-button"),
 			attachment: "middle center",
 			targetAttachment: "middle center"
 		})
