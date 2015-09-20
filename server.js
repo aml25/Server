@@ -1,38 +1,69 @@
 /*** ALL THE REQUIRES ***/
-var fs = require('fs');
-var http = require('http');
 var express = require('express');
-var app = module.exports.app = express();
-var server = http.createServer(app); //the server, serving the files to clients
+var app = express();
+var appServer = require("http").createServer(app);
+
 var bodyParser = require('body-parser');
-var io = require('socket.io')(server);
-var url = require("url");
-var path = require('path');
+
 var TuneFarm = require('TuneFarm.js');
-TuneFarm = new TuneFarm();
 var GrossNinja = require('GrossNinja.js');
-GrossNinja = new GrossNinja();
+
+//hosts that I want to listen for
+var hosts = {
+				"gross.ninja": {
+					server: new GrossNinja(appServer),
+					directory: "GrossNinja"
+				},
+				"tune.farm": {
+					server: new TuneFarm(appServer),
+					directory: "TuneFarm"
+				}
+			};
 /*** ============================== ***/
 
 var host;
-var staticHost = "tune.farm";
-
-//config for username and password
-//var messages = JSON.parse(fs.readFileSync("wall.json"));
+var server;
+var staticHost = "tune.farm"; //this is a placeholder for local testing
 
 //set up headers for the server (not sure if this is really needed)
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	next();
 });
 
 //extend Express for JSON
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-//serve a folder called "public," which contains all the data to be served to clients
-//app.use(express.static(__dirname + '/public'));
+//bring in the JS folder to the server to be used by all HTML pages
+app.use(express.static(__dirname + '/public/js'));
+
+
+app.use(function(req,res){
+	//ignore if favicon
+	if(req.url === '/favicon.ico') {
+		res.writeHead(200, {'Content-Type': 'image/x-icon'} );
+		res.end();
+		console.log('favicon requested');
+		return;
+	}
+
+	if(host == undefined){
+		//set the host environment when a user visits the website
+		host = setHostEnvironment(req.headers.host);
+
+		server = hosts[host].server;
+		server.init();
+	}
+
+	try{
+		server.handleRequest(req, res);		
+	}
+	catch(err){
+		server.send("404");
+	}
+})
 
 function setHostEnvironment(newHost){
 	var host = newHost == "localhost" ? staticHost : newHost;
@@ -40,22 +71,7 @@ function setHostEnvironment(newHost){
 	return host;
 }
 
-
-app.get("/", function(req, res){
-	//set the host environment when a user visits the website
-	host = setHostEnvironment(req.headers.host);
-	switch(host){
-		case "tune.farm":
-			TuneFarm.visit(req,res);
-			break;
-		case "gross.ninja":
-			GrossNinja.visit(req,res);
-			break;
-	}
-});
-
-
 /*** FINALLY, START LISTENING ON THE SERVER ***/
-server.listen(80,  function(){
-    console.log(server.address());
+appServer.listen(80,  function(){
+    console.log(appServer.address());
 });

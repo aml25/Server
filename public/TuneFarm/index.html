@@ -1,8 +1,199 @@
 <html>
 <head>
 	<title>Tune Farm</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="mobile-web-app-capable" content="yes">
+
+	<script type="text/javascript" src="/jquery.min.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+	<script type="text/javascript" src="/mapStyle.js"></script>
+	<script type="text/javascript" src="/tether.min.js"></script>
+
+	<link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
+	<style type="text/css">
+		html,body{
+			font-family: 'Muli', sans-serif;
+			font-weight: 400;
+			font-size: 14px;
+			background-color: #424242;
+			padding:0px;
+			margin:8px;
+		}
+		#logo{
+			font-size: 2rem;
+			//border-bottom: 1rem solid #FF4054;
+			color: #70E852;
+			top:0px;
+			left:0px;
+			margin:10px;
+		}
+
+		.button-circle{
+			width:2.75rem;
+			height:2.75rem;
+			border-radius: 50%;
+			background-color: #fff;
+			display:inline-block;
+			margin-left:8px;
+		}
+
+		.button-circle:first-child{
+			margin-left:0px;
+		}
+
+		.absolute{
+			position:absolute;
+		}
+
+		.fixed{
+			position: fixed;
+		}
+
+		#menu{
+			top:0;
+			right:0;
+			float:right;
+			margin:8px;
+		}
+
+		.dropShadow{
+			box-shadow: 2px 6px 15px #111;
+		}
+
+		.textShadow{
+			text-shadow: 0px 4px 8px #111;
+		}
+
+		#playbar{
+			left:0;
+			right:4rem;
+			bottom:1rem;
+			margin:8px;
+		}
+
+		#timeline{
+			width:100%;
+			height:0.5rem;
+			background-color: #70E852;
+		}
+
+		#play-button{
+			width:2.25rem;
+			height:2.25rem;
+			background-color: #70E852 !important;
+		}
+
+		#play-button-img{
+			width:2rem;
+			height: 2rem;
+		}
+
+		#playlist-button{
+			bottom:0;
+			right:0;
+			margin:8px;
+		}
+
+
+	</style>
 </head>
 <body>
-Welcome to Tune Farm!
+	<div id="logo" class="fixed textShadow">Tune Farm</div>
+
+	<div id="menu" class="fixed">
+		<div class="button-circle dropShadow"></div>
+		<div class="button-circle dropShadow"></div>
+		<div class="button-circle dropShadow"></div>
+	</div>
+
+	<div id="playbar" class="fixed">
+		<div id="play-button" class="button-circle">
+		</div>
+		<img id="play-button-img" src="img/play.svg">
+		<div id="timeline" class="absolute"></div>
+	</div>
+
+	<div id="playlist-button" class="button-circle fixed"></div>
+
+	<!--<ul>
+		<li>browse</li>
+		<li>stations</li>
+		<li>settings</li>
+	</ul>-->
+
+	
+	<script type="text/javascript">
+		var room = window.location.pathname.substring(1);
+		console.log(room);
+
+		var currScroll = window.scrollY;
+		var scrolling = false;
+
+		function hideMenu(){
+			var logoWidth = $("#logo").width();
+			$("#logo").animate({
+				"left": (-1 * logoWidth *0.8) + "px"
+			},500);
+
+			var menuWidth = $("#menu").width();
+			$("#menu").animate({
+				"right": (-1 * menuWidth *0.8) + "px"
+			},500);
+		}
+
+		function returnMenu(){
+			$("#logo").animate({
+				"left": 0 + "px"
+			},500);
+
+			$("#menu").animate({
+				"right": 0 + "px"
+			},500);
+		}
+
+		$(window).on("scroll", function(e){
+			clearTimeout($.data(this, 'scrollTimer'));
+			$.data(this, 'scrollTimer', setTimeout(function() {
+				scrolling = false;
+				console.log("Haven't scrolled in 250ms!");
+			}, 50));
+
+			if(!scrolling){
+				if(window.scrollY <= currScroll){
+					
+					returnMenu();
+				}
+				else{
+					
+					hideMenu();
+				}
+			}
+
+			currScroll = window.scrollY;
+			scrolling = true;
+		});
+		$(window).on("scrollstop",function(e){
+			console.log("scrollstoped");
+		});
+
+		//tether stuff
+		new Tether({
+			element: $("#play-button-img"),
+			target: $("#play-button"),
+			attachment: "middle center",
+			targetAttachment: "middle center"
+		})
+		//////////////
+
+		$(document).ready(function(){
+			console.log("welcome to tune farm");
+
+			var socket = io('http://localhost'); //will need to change the address
+			socket.emit("join", {room: room});
+		});
+	</script>
+
 </body>
 </html>
