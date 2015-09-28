@@ -11,11 +11,15 @@ var GrossNinja = require('GrossNinja.js');
 //hosts that I want to listen for
 var hosts = {
 				"gross.ninja": {
-					server: new GrossNinja(appServer),
+					server: function(){
+						return new GrossNinja(appServer)
+					},
 					directory: "GrossNinja"
 				},
 				"tune.farm": {
-					server: new TuneFarm(appServer),
+					server: function(){
+						return new TuneFarm(appServer)
+					},
 					directory: "TuneFarm"
 				}
 			};
@@ -45,17 +49,25 @@ app.use(function(req,res){
 	if(req.url === '/favicon.ico') {
 		res.writeHead(200, {'Content-Type': 'image/x-icon'} );
 		res.end();
-		console.log('favicon requested');
+		//console.log('favicon requested');
 		return;
 	}
 
-	if(host == undefined){
+	//if(host == undefined){
 		//set the host environment when a user visits the website
 		host = setHostEnvironment(req.headers.host);
+		//console.log(host);
 
-		server = hosts[host].server;
-		server.init();
-	}
+		console.log("request for: " + req.url);
+
+		try{
+			server = hosts[host].server();
+		}
+		catch(err){
+			server = hosts[staticHost].server();
+		}
+		server.init(req.url);
+	//}
 
 	try{
 		server.handleRequest(req, res);		

@@ -1,0 +1,10 @@
+{
+	"playmusic": {
+		"email": "someemail",
+		"password": "somepassword"
+	},
+	"email": {
+		"email": "someemail",
+		"password": "somepassword"
+	}
+}

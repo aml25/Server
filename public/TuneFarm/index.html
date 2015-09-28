@@ -1,301 +1,528 @@
 <html>
 <head>
-	<title>Tune Farm</title>
-
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="mobile-web-app-capable" content="yes">
 
+	<title>Tune Farm</title>
+
 	<script type="text/javascript" src="/jquery.min.js"></script>
 	<script type="text/javascript" src="/jquery-ui.min.js"></script>
-	<script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
-	<script type="text/javascript" src="/mapStyle.js"></script>
-	<script type="text/javascript" src="/tether.min.js"></script>
+	<script src="/socket.io-1.3.5.js"></script>
 
-	<link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,600,700' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="/vex-theme-plain.css" />
+	<link rel="stylesheet" href="/vex.css" />
+	<script src="/vex.combined.min.js"></script>
+	<script>
+		(function(){
+	        vex.defaultOptions.className = 'vex-theme-plain';
+	    })();
+    </script>
+
 	<style type="text/css">
 		html,body{
-			font-family: 'Muli', sans-serif;
+			font-size: 16px;
+			font-family: 'Source Sans Pro', sans-serif;
 			font-weight: 400;
-			font-size: 14px;
-			background-color: #424242;
-			padding:0px;
-			margin:8px;
-		}
-		#logo{
-			font-size: 2rem;
-			//border-bottom: 1rem solid #FF4054;
-			color: #70E852;
-			top:0px;
-			left:0px;
-			margin:10px;
 		}
 
-		.button-circle{
-			width:2.75rem;
-			height:2.75rem;
-			border-radius: 50%;
-			background-color: #fff;
-			display:inline-block;
-			margin-left:8px;
-		}
-
-		.selected{
-			background-color: #70E852;
-		}
-
-		.button-circle:first-child{
-			margin-left:0px;
-		}
-
-		.absolute{
-			position:absolute;
-		}
-
-		.fixed{
-			position: fixed;
-		}
-
-		#menu{
-			top:0;
-			right:0;
-			float:right;
-			margin:8px;
-		}
-
-		/*.dropShadow{
-			box-shadow: 2px 6px 15px #111;
-		}
-
-		.textShadow{
-			text-shadow: 0px 4px 8px #111;
-		}*/
-
-		#playbar{
-			left:0;
-			right:4rem;
-			bottom:1rem;
-			margin:8px;
-		}
-
-		#timeline{
+		input{
 			width:100%;
-			height:10px;
-			background-color: #70E852;
+			font-size:1rem;
 		}
 
-		#play-button{
-			background-color: #70E852 !important;
-			bottom:0px;
-			left:0px;
+		section{
+			margin:2rem;
 		}
 
-		#playlist-button{
-			bottom:0;
-			right:0;
-			margin:8px;
+		ul{
+			margin:2rem;
 		}
 
-		.largeButton{
-			width:2.75rem;
-			height:2.75rem;
-			
+		li{
+			cursor: pointer;
 		}
 
-		.smallButton{
-			width:2rem;
-			height:2rem;
-			
+		li:hover{
+			background-color:#8AE859;
 		}
 
-		.smallImg{
-			width:0.85rem;
-			height:0.85rem;
-			margin-left: 0.575rem;
-			margin-top: 0.575rem;
+		p{
+			white-space: nowrap;
+			text-overflow: ellipsis;     /** IE6+, Firefox 7+, Opera 11+, Chrome, Safari **/
+        	-o-text-overflow: ellipsis;  /** Opera 9 & 10 **/
+			overflow:hidden;
 		}
 
-		.largeImg{
-			width:1.4rem;
-			height:1.4rem;
-			margin-left: 0.675rem;
-			margin-top: 0.675rem;
+		p:hover{
+			background-color:#8AE859;
+		}
+
+		.playing{
+			background-color:#8AE859;
+		}
+
+		main{
+			display:none;
+		}
+
+		/*#audioControls{
+			float:right;
+		}*/
+		span{
+			margin-right: 6px;
+		}
+
+		#currentTrack, #currentTime{
+			vertical-align: top;
+		}
+
+		#currentTime{
+			color: #bababa;
 		}
 
 		img{
-			-moz-user-select: -moz-none;
-		    -khtml-user-select: none;
-		    -webkit-user-select: none;
-		    -o-user-select: none;
-		    user-select: none;
-		    pointer-events: none;
+			width:1.5rem;
 		}
 
+		audio{
+			float:right;
+			display:none;
+		}
 
+		.description{
+			color:#8AE859;
+		}
+
+		#feedback{
+			  font-size: 1rem;
+			  float: right;
+			  font-weight: normal;
+			  margin-top: 0.5rem;
+		}
+
+		textarea{
+			resize:none;
+		}
 	</style>
 </head>
 <body>
-	<div id="logo" class="fixed textShadow">Tune Farm</div>
 
-	<div id="menu" class="fixed">
-		<div id="browse-button" class="button-circle dropShadow selected">
-		<img id="browse-button-img" class="largeImg" src="img/browse.svg"></div>
-		<div id="broadcast-button" class="button-circle dropShadow">
-		<img id="broadcast-button-img" class="largeImg" src="img/broadcast.svg"></div>
-		<div id="settings-button" class="button-circle dropShadow">
-		<img id="settings-button-img" class="largeImg" src="img/settings.svg"></div>
+	<h1>Tune Farm
+		<audio controls src="" type="audio/mpeg"></audio>
+		<div id="feedback">Send feedback</div>
+	</h1>
+
+	<div id="audioControls">
+			<span id="previous"><img src="/img/previous.png"/></span>
+			<!-- <span id="pause"><img src="/img/pause.png"/></span> -->
+			<span id="playPause"><img src="/img/play.png"/></span>
+			<span id="next"><img src="/img/next.png"/></span>
+			<span id="currentTrack"></span>
+			<span id="currentTime"></span>
 	</div>
 
-	<div id="playbar" class="fixed">
-		<div id="play-button" class="button-circle smallButton absolute">
-		
-		<img id="play-button-img" class="smallImg" src="img/play.svg"></div>
-		<div id="timeline" class="absolute"></div>
+	<div class="description">
+		<br>
+		Welcome to most social music site on the internet.  At Tune Farm whatever you hear, your friends will hear too!  Just share the link and start grooving.
 	</div>
-
-	<div id="playlist-button" class="button-circle fixed">
-	<img id="playlist-button-img" class="largeImg" src="img/playlist.svg"></div>
-
-	<!--<ul>
-		<li>browse</li>
-		<li>stations</li>
-		<li>settings</li>
-	</ul>-->
-
 	
+
+	<ul>
+		<li data-link="browse">Browse</li>
+		<li data-link="playlist">Playlist</li>
+		<li data-link="broadcasts">Broadcasts</li>
+	</ul>
+
+	<!-- page to be shown for browsing -->
+	<main style="display: block;" id="browse">
+		<form action="javascript:formSubmit()">
+			<input type="text" id="searchQuery" placeholder="Search for some music">
+		</form>
+
+		<h2>Artists</h2>
+		<section id="artists">
+		</section>
+
+		<h2>Albums</h2>
+		<section id="albums">
+		</section>
+
+		<h2>Tracks</h2>
+		<section id="tracks">
+		</section>
+	</main>
+
+	<main id="broadcasts">
+		<h2>Public Broadcasts</h2>
+		<section id="broadcastsList">
+		</section>
+	</main>
+
+	<main id="playlist">
+		<section id="myPlaylist">
+		</section>
+	</main>
+
+
+	<!-- NOW THE JAVASCRIPT STUFF -->
+
 	<script type="text/javascript">
-		var room = window.location.pathname.substring(1);
-		console.log(room);
+		var playlist = [];
+		var currTrackIndex = 0; //keep track of which song from the playlist we are on
 
-		var currScroll = window.scrollY;
-		var scrolling = false;
+		var audioElement = $("audio");
 
-		function hideMenu(){
-			var logoWidth = $("#logo").width();
-			$("#logo").animate({
-				"left": (-1 * logoWidth *0.8) + "px"
-			},500);
+		var playUpdater;
 
-			var menuWidth = $("#menu").width();
-			$("#menu").animate({
-				"right": (-1 * menuWidth *0.8) + "px"
-			},500);
-		}
+		var isPlaying = false;
 
-		function returnMenu(){
-			$("#logo").animate({
-				"left": 0 + "px"
-			},500);
+		var isBroadcasting = false;
 
-			$("#menu").animate({
-				"right": 0 + "px"
-			},500);
-		}
-
-		$(window).on("scroll", function(e){
-			clearTimeout($.data(this, 'scrollTimer'));
-			$.data(this, 'scrollTimer', setTimeout(function() {
-				scrolling = false;
-				console.log("Haven't scrolled in 250ms!");
-			}, 50));
-
-			if(!scrolling){
-				if(window.scrollY <= currScroll){
-					
-					returnMenu();
-				}
-				else{
-					
-					hideMenu();
-				}
-			}
-
-			currScroll = window.scrollY;
-			scrolling = true;
-		});
-		$(window).on("scrollstop",function(e){
-			console.log("scrollstoped");
-		});
-
-		/***BUTTON INTERACTION STUFF**********/
-
-		//menu interaction
-		$("#menu .button-circle").click(function(){
-			$("#menu .button-circle").removeClass("selected", 300);
-			$(this).addClass("selected", 300);
-		});
-
-		//playlist interaction
-		$("#playlist-button").click(function(){
-			$(this).toggleClass("selected", 300);
-
-			var startDeg;
-			var endDeg;
-
-			if($(this).hasClass("selected")){
-				startDeg = -90;
-				endDeg = 0;
+		$("#playPause").click(function(){
+			if(!isPlaying){
+				emitPlayTrack();
 			}
 			else{
-				startDeg = 0;
-				endDeg = -90;
+				pauseTrack();
 			}
+		});
 
-			$elem = $(this);
-			$({deg: startDeg}).animate({deg: endDeg}, {
-		        duration: 250,
-		        step: function(now) {
-		            // in the step-callback (that is fired each step of the animation),
-		            // you can use the `now` paramter which contains the current
-		            // animation-position (`0` up to `angle`)
-		            $elem.css({
-		                transform: 'rotate(' + now + 'deg)'
-		            });
-		        },
-		        easing: "easeOutCirc",
-		        queue: false
-		    });
+		$("#playPause").one("click", function(){
+			if(!isBroadcasting){
+				vex.dialog.confirm({
+					message: 'Do you want to turn your playlist into a radio station?',
+					buttons: [
+						$.extend({}, vex.dialog.buttons.YES, {
+							text: 'Sure'
+						}), $.extend({}, vex.dialog.buttons.NO, {
+							text: 'No'
+						})
+					],
+					callback: function(value) {
+						if(value == true){
+							broadcastRoom(true);
+						}
+						else{
+							broadcastRoom(false);
+						}
+					}
+				});
+			}
 		})
 
-		var playButtonRotation = 0;
-		var playButtonClicked = false;
+		$("#next").click(function(){
+			playNextTrack();
+		});
 
-		//play button interaction
-		$("#play-button").click(function(){
-			playButtonClicked = !playButtonClicked;
-			if(playButtonClicked){
-				playMover = setInterval(function(){
-					//calculate the current percentage
-					var percentage = parseFloat($("#play-button").css("left")) / $("#playbar").width() * 100;
-					playButtonRotation += 4;
-					//////////////////////////////////
+		$("#previous").click(function(){
+			playPreviousTrack();
+		});
 
-					if(parseFloat($("#play-button").css("left")) + $("#play-button").width() >= $("#playbar").width()){
-						clearInterval(playMover);
+		$("#feedback").click(function(){
+			vex.dialog.open({
+				message: "",
+				input: "<input name='email' type='text' placeholder='Your email' required />\n<textarea rows='4' name='body' placeholder='Your message' required></textarea>",
+				buttons: [
+				$.extend({}, vex.dialog.buttons.YES, {
+					text: 'Send'
+				}), $.extend({}, vex.dialog.buttons.NO, {
+					text: 'Nevermind'
+				})
+				],
+				callback: function(data) {
+					if (data === false) {
+						return console.log('Cancelled');
 					}
-					else{
-						$("#play-button").css("left", (percentage+0.25) + "%");
-						$("#play-button").css("transform", "rotate("+playButtonRotation+"deg");
-					}
+					socket.emit("sendFeedback", data);
+				}
+			});
+		})
 
-				}, 15);
+		audioElement[0].onended = function(){
+			playNextTrack();
+		}
+
+		audioElement[0].onplay = function(){
+			console.log("audio element playing");
+		}
+
+		audioElement[0].onpause = function(){
+			pauseTrack();
+		}
+
+		function formSubmit(){
+			console.log("submitting search");
+			$("input").blur();
+			socket.emit("search", { query: $("input").val() });
+		}
+
+		$("li").click(function(e){
+			$("#"+$(this).attr("data-link")).delay(500).fadeIn(550);
+			$("main").not("#"+$(this).attr("data-link")).fadeOut(500);
+		});
+
+
+
+		/***SOCKET FUNCTIONS*******************************/
+		var socket = io('http://192.168.1.100'); //initiate the socket
+
+		/***MOVE THESE TO SOMEWHERE LATER, PLACEHOLDERS*******************/
+		joinRoom(window.location.pathname); 
+
+		window.onbeforeunload = function(){
+			socket.emit("leaveRoom", "");
+		}
+
+		socket.emit("getPlaylist", ""); //just grab any existing playlist on the server (**for this broadcast, when it's implemented**)
+
+		socket.emit("getBroadcastRooms", ""); //on page load, grab existing rooms
+		/*******************MOVE THESE TO SOMEWHERE LATER, PLACEHOLDERS***/
+
+		//handle the result of joining a room from the server.  basically - if the connection to the server was made at root level, push to the URL the unique room name to keep track of URLs and rooms for the servers purpose
+		socket.on("joinRoomResults", function(data){
+			history.pushState({}, null, data.roomDetails.roomName);
+			isBroadcasting = data.roomDetails.liveState;
+		})
+
+		//handle search results from the server
+		socket.on("searchResults", function(data){
+			console.log(data);
+
+			drawBrowseResults(data);
+		});
+
+		//handle artist results from the server
+		socket.on("artistResults", function(data){
+			console.log(data);
+
+			drawBrowseResults(data);
+		});
+
+		//handle album results from the server
+		socket.on("albumResults", function(data){
+			console.log(data);
+
+			drawBrowseResults(data);
+		});
+
+		//handle playlist results from server
+		socket.on("playlistResults", function(data){
+			playlist = data;
+			console.log(playlist);
+
+			drawPlaylistResults(playlist);
+
+			currTrackIndex = data.currentTrack;
+
+			if(data.isPlaying){
+				playTrack(data.currentTime);
+			}
+
+			/*if(audioElement.attr("src")==""){
+				try{ //for some reason this crashes my server.....
+					//audioElement.attr("src",playlist.tracks[0].src);
+				}
+				catch(error){
+					//console.log(error);
+				}
+			}*/
+		});
+
+		//signal from server to start playing a track on the client... could have come from THIS client or from a another client that THIS client is connected to
+		socket.on("playTrackResults", function(data){
+			currTrackIndex = data.currentTrack;
+
+			console.log("playing: " + playlist.tracks[currTrackIndex].trackData.artist + " - " + playlist.tracks[currTrackIndex].trackData.title);
+
+			playTrack(data.currentTime);
+
+			//make the current track in the playlist "playing"
+			$($("#myPlaylist").children()[currTrackIndex]).addClass("playing");
+			//make all other tracks "not playing"
+			$($("#myPlaylist").children().not($("#myPlaylist").children()[currTrackIndex])).removeClass("playing");
+		});
+
+		//a room's state has changed, update available rooms to clients
+		socket.on("broadcastRoomResults", function(data){
+			drawBroadcastsResults(data);
+		});
+
+		//a client just said pause to the room, so we will pause (I need to figure out if this is the desired resulting experience)
+		socket.on("pauseTrackResults", function(){
+			audioElement[0].pause();
+		});
+
+		socket.on("numberOfListenersResults", function(data){
+			console.log(data);
+		});
+
+		/*******************************SOCKET FUNCTIONS***/
+
+		
+
+		function joinRoom(roomId){
+			socket.emit("joinRoom", roomId);
+		}
+
+		//this is the main play function!!!
+		function emitPlayTrack(currentTime){
+
+			if(currentTime == undefined){
+				currentTime = audioElement[0].currentTime;
+			}
+
+			if(currTrackIndex < playlist.tracks.length){
+				socket.emit("playTrack", {currTrackIndex: currTrackIndex, currTrackTime: currentTime}); //send signal to everyone to start playing			
 			}
 			else{
-				clearInterval(playMover);
+				console.log("reached the end of the playlist");
 			}
-		});
-		/**********BUTTON INTERACTION STUFF***/
+		}
 
-		/***TETHER STUFF**********************/
-		/**********************TETHER STUFF***/
+		function playTrack(currentTime){
+			if(currentTime == undefined){
+				currentTime = 0;
+			}
+			if(audioElement.attr("src") != playlist.tracks[currTrackIndex].src){
+				audioElement.attr("src",playlist.tracks[currTrackIndex].src);
+			}
+			audioElement[0].play();
+			audioElement[0].currentTime = currentTime;
 
-		$(document).ready(function(){
-			console.log("welcome to tune farm");
+			playUpdater = setInterval(function(){
+				socket.emit("updateCurrentTime", audioElement[0].currentTime);
+				$("#currentTime").text(displayCurrentTime);
+			}, 1000);
 
-			var socket = io('http://localhost'); //will need to change the address
-			socket.emit("join", {room: room});
-			Tether.position();
-		});
+			$("#playPause").children().attr("src", "/img/pause.png");
+			isPlaying = true;
+
+			$("#currentTrack").text(playlist.tracks[currTrackIndex].trackData.artist + " - " + playlist.tracks[currTrackIndex].trackData.title);
+			
+		}
+
+		function pauseTrack(){
+			socket.emit("pauseTrack", "");
+			clearInterval(playUpdater);
+
+			$("#playPause").children().attr("src", "/img/play.png");
+			isPlaying = false;
+		}
+
+		function playNextTrack(){
+			clearInterval(playUpdater);
+			currTrackIndex = currTrackIndex == playlist.tracks.length - 1 ? 0 : currTrackIndex + 1;
+			emitPlayTrack(0);
+		}
+
+		function playPreviousTrack(){
+			clearInterval(playUpdater);
+			currTrackIndex = currTrackIndex == 0 ? playlist.tracks.length - 1 : currTrackIndex - 1;
+			emitPlayTrack(0);
+		}
+
+		function displayCurrentTime(){
+			var date = new Date(null);
+			date.setSeconds(audioElement[0].currentTime); // specify value for SECONDS here
+			var displayTime = date.toISOString().substr(14, 5);
+
+			var date2 = new Date(null);
+			date2.setSeconds(audioElement[0].duration); // specify value for SECONDS here
+			displayTime += " / " + date2.toISOString().substr(14, 5);
+
+			return displayTime;
+		}
+
+		//broadcast the currently private room
+		function broadcastRoom(state){
+			socket.emit("broadcastRoom", state);
+		}
+
+		//the main function to draw the browse music results from server
+		function drawBrowseResults(data){
+			window.scrollTo(0,0);
+			$("#browse section").empty();
+
+			if(data.artists != null){
+				$("#artists").prev().show();
+				for(var i=0;i<data.artists.length;i++){
+					var $p = $("<p>"+data.artists[i].name+"</p>");
+					$p.data(data.artists[i]);
+
+					$p.click(function(){
+						socket.emit("getArtist", $(this).data());
+					})
+
+					$("#artists").append($p);
+				}
+			}
+			else{
+				$("#artists").prev().hide();
+			}
+
+			for(var i=0;i<data.albums.length;i++){
+				var $p = $("<p>"+data.albums[i].name+"</p>");
+				$p.data(data.albums[i]);
+
+				$p.click(function(){
+					socket.emit("getAlbum", $(this).data());
+				})
+
+				$("#albums").append($p);
+			}
+
+			for(var i=0;i<data.tracks.length;i++){
+				var $p = $("<p>"+data.tracks[i].title+"</p>");
+				$p.data(data.tracks[i]);
+
+				$p.click(function(){
+					//socket.emit("playTrack", $(this).data());
+					socket.emit("addTrackToPlaylist", $(this).data());
+					$(this).html("<em>track added to your playlist</em>");
+					$(this).unbind();
+				})
+
+				$("#tracks").append($p);
+			}
+		}
+
+		function drawBroadcastsResults(data){
+			$("#broadcasts #broadcastsList").empty();
+
+			for(var i=0;i<data.length;i++){
+				$broadcast = "<details> \
+					<summary><a href='"+data[i].roomDetails.roomName+"'>"+data[i].roomDetails.roomName+"</a></summary>\
+					</details>";
+
+				$("#broadcasts #broadcastsList").append($broadcast);
+
+				for(var u=0;u<data[i].tracks.length;u++){
+					var $p = "<p>"+data[i].tracks[u].trackData.artist+" - "+data[i].tracks[u].trackData.title+"</p>";
+					$("#broadcasts #broadcastsList details").last().append($p);
+				}
+				
+			}
+		}
+
+		function drawPlaylistResults(data){
+			$("#playlist #myPlaylist").empty();
+			playlist = data;
+			//console.log(playlist);
+			for(var u=0;u<data.tracks.length;u++){
+				var $p = $("<p>"+data.tracks[u].trackData.artist+" - "+data.tracks[u].trackData.title+"</p>");
+				$p.data({trackIndex: u});
+
+				$p.click(function(){
+					currTrackIndex = $(this).data().trackIndex;
+					emitPlayTrack(0);
+				})
+
+				$("#playlist #myPlaylist").last().append($p);
+			}
+		}
 	</script>
 
 </body>
