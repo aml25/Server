@@ -86,24 +86,24 @@ function lastIndex(array){
 		
 		//join a client to a room
 		socket.on("joinRoom", function(room){
-			var room = room.length > 1 ? room : "/" + lastIndex(socket.rooms);
+			var room = room;
 			console.log(room);
 
 			socket.join(room, function(){
-				console.log("joining room: " + lastIndex(socket.rooms));
+				console.log("joining room: " + room);
 
 				var myRoom = {};
 
 				if(!rooms.hasOwnProperty(lastIndex(socket.rooms))){
 					console.log("setting room for the first time...");
-					rooms[lastIndex(socket.rooms)] = {
+					rooms[room] = {
 						tracks: [],
 						currentTrack: 0,
 						currentTime: 0,
 						isPlaying: false,
 						roomDetails: {
 							liveState: false,
-							roomName: lastIndex(socket.rooms),
+							roomName: room,
 							numListeners: 0
 						}
 					};
@@ -253,7 +253,11 @@ function lastIndex(array){
 		});
 
 		socket.on("updateCurrentTime", function(data){
+			console.log("updating currentTime");
+			console.log("for room: " + lastIndex(socket.rooms));
+			console.log("with currentTime: " + data);
 			rooms[lastIndex(socket.rooms)].currentTime = data;
+			console.log("currentTime in JSON = " + rooms[lastIndex(socket.rooms)].currentTime);
 		});
 
 		socket.on("sendFeedback", function(data){
