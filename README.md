@@ -1,5 +1,8 @@
 # Tune Farm codebase
 
+*Disclaimer
+- This is purely for experimentation.  Any stream grabbed from the `playmusic` library is strictly for testing purposes only and should never be stored.
+
 You'll need to create a configuration file to get this running properly in the parent `Server/` folder called `config.json`.  It should look like this:
 
 
