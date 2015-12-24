@@ -1,7 +1,8 @@
 config.json
 tunefarmconfig.json
-tunefarm/000003.log
-tunefarm/CURRENT
-tunefarm/LOCK
-tunefarm/LOG
-tunefarm/MANIFEST-000002
+log.txt
+_replicator/
+_users/
+pouch__all_dbs__/
+pouch__auth_sessions__/
+tunefarm/
