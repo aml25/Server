@@ -5,6 +5,15 @@
 
 You need an "All Access" account with Google Music for this repo to function.  Also, you'll need to create a configuration file to get this running properly in the parent `Server/` folder called `tunefarmconfig.json`.  The format of this file is below in the `Init Library` function description.
 
+Prerequisites
+---
+- [PouchDB](http://pouchdb.com/guides/)
+- node packages 
+	- [playmusic library by jamon](https://github.com/jamon/playmusic)
+	- emailjs
+	- express
+	- socket.io
+	- body-parser
 
 Documentation
 ---
