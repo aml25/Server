@@ -1,22 +1,9 @@
 # Tune Farm codebase
 
 *Disclaimer
-- This is purely for experimentation.  Any stream grabbed from the `playmusic` library is strictly for testing purposes only and should never be stored.
+- This is purely for experimentation.  Any stream grabbed from the `playmusic` library is strictly for testing purposes only and should never be stored.  This repo will drop Google Music as a source either upon request, or until ready for user testing.
 
-You'll need to create a configuration file to get this running properly in the parent `Server/` folder called `config.json`.  It should look like this:
-
-
-	{
-		"playmusic": { /*this is your Google Music account*/
-			"email": "some@email.com",
-			"password": "somepassword"
-		},
-		"email": { /*this email is for the built in feedback mailer function - your customer service...*/
-			"email": "someother@email.com",
-			"password": "somepassword"
-		}
-	}
-
+You need an "All Access" account with Google Music for this repo to function.  Also, you'll need to create a configuration file to get this running properly in the parent `Server/` folder called `config.json`.  The format of this file is below in the `Init Library` function description.
 
 
 Documentation
@@ -27,11 +14,34 @@ MusicLibrary
 
 It has the following functions
 ```
+var musicLibrary = require("musicLibrary.js");
+
+initLibrary(config)  //start the Google Play service authentication.
 search(query, _callback)  //is an asychronous function so it cannot return anything directly.  Use the `_callback` parameter for this.
-getArtist(query, _callback) //same goes for this with it being an asycnhronous request.
-getAlbum(query, _callback) //same goes here, use _callbak for a data return.
-getTrack(storeId, _callback) //only looking for the "storeId" here, which is just a String
+getArtist(query, _callback)  //same goes for this with it being an asycnhronous request.
+getAlbum(query, _callback)  //same goes here, use _callbak for a data return.
+getTrack(storeId, _callback)  //only looking for the "storeId" here, which is just a String
 ```
+
+Init Library
+---
+
+The function to start everything and authenticate an account with Google Play.  Please refer to [playmusic library by jamon](https://github.com/jamon/playmusic) for more info if needed.  It does not return anything.
+
+- `config.json` should be formatted like this
+
+	```
+	{
+		"playmusic": { /*this is your Google Music account*/
+			"email": "some@email.com",
+			"password": "somepassword"
+		},
+		"email": { /*this email is for the built in feedback mailer function - your customer service...*/
+			"email": "someother@email.com",
+			"password": "somepassword"
+		}
+	}
+	```
 
 Search
 ---
