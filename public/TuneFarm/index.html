@@ -192,8 +192,19 @@
 
 		$("#playPause").one("click", function(){
 			if(!isBroadcasting){
-				vex.dialog.confirm({
+
+				// vex.dialog.prompt({
+				// 	message: 'What planet did the aliens come from?',
+				// 	placeholder: 'Planet name',
+				// 	callback: function(value) {
+				// 	return console.log(value);
+				// 	}
+				// });
+
+
+				vex.dialog.prompt({
 					message: 'Do you want to turn your playlist into a radio station?',
+					placeholder: 'Station name',
 					buttons: [
 						$.extend({}, vex.dialog.buttons.YES, {
 							text: 'Sure'
@@ -202,11 +213,12 @@
 						})
 					],
 					callback: function(value) {
-						if(value == true){
-							broadcastRoom(true);
+						if(value == false){
+							broadcastRoom(false);
 						}
 						else{
-							broadcastRoom(false);
+							joinRoom("/"+value);
+							broadcastRoom(true);
 						}
 					}
 				});
@@ -267,25 +279,22 @@
 
 
 		/***SOCKET FUNCTIONS*******************************/
-		var socket = io('http://192.168.1.100'); //initiate the socket
+		var socket = io('http://localhost'); //initiate the socket
 
-		/***MOVE THESE TO SOMEWHERE LATER, PLACEHOLDERS*******************/
-		joinRoom(window.location.pathname); 
-
-		window.onbeforeunload = function(){
-			socket.emit("leaveRoom", "");
-		}
-
-		socket.emit("getPlaylist", ""); //just grab any existing playlist on the server (**for this broadcast, when it's implemented**)
-
-		socket.emit("getBroadcastRooms", ""); //on page load, grab existing rooms
-		/*******************MOVE THESE TO SOMEWHERE LATER, PLACEHOLDERS***/
+		//load the room//
+        if(window.location.pathname == "/"){
+        	joinRoom(("/"+Math.random()*Math.random()*Math.random())/Math.random());
+        }
+        else{
+        	joinRoom(window.location.pathname);
+        }
+        /////////////////
 
 		//handle the result of joining a room from the server.  basically - if the connection to the server was made at root level, push to the URL the unique room name to keep track of URLs and rooms for the servers purpose
 		socket.on("joinRoomResults", function(data){
 			history.pushState({}, null, data.roomDetails.roomName);
 			isBroadcasting = data.roomDetails.liveState;
-		})
+		});
 
 		//handle search results from the server
 		socket.on("searchResults", function(data){
@@ -363,9 +372,22 @@
 
 		
 
+		//the main room handler function
 		function joinRoom(roomId){
-			socket.emit("joinRoom", roomId);
+		    socket.emit("joinRoom", roomId);
+
+		    window.onbeforeunload = function(){
+		        socket.emit("leaveRoom", "");
+		    }
+
+		    socket.emit("getPlaylist", ""); //just grab any existing playlist on the server (**for this broadcast, when it's implemented**)
+
+		    socket.emit("getBroadcastRooms", ""); //on page load, grab existing rooms
 		}
+
+
+
+
 
 		//this is the main play function!!!
 		function emitPlayTrack(currentTime){

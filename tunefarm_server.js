@@ -89,6 +89,8 @@ function lastIndex(array){
 			var room = room;
 			console.log(room);
 
+			console.log("was a part of: " + lastIndex(socket.rooms));
+
 			socket.join(room, function(){
 				console.log("joining room: " + room);
 
@@ -115,6 +117,8 @@ function lastIndex(array){
 
 				var num = rooms[lastIndex(socket.rooms)].roomDetails.numListeners;
 				io.sockets.in(lastIndex(socket.rooms)).emit("numberOfListenersResults", num);
+
+				console.log(JSON.stringify(rooms, null, 4));
 			});
 		});
 
@@ -253,11 +257,11 @@ function lastIndex(array){
 		});
 
 		socket.on("updateCurrentTime", function(data){
-			console.log("updating currentTime");
-			console.log("for room: " + lastIndex(socket.rooms));
-			console.log("with currentTime: " + data);
+			// console.log("updating currentTime");
+			// console.log("for room: " + lastIndex(socket.rooms));
+			// console.log("with currentTime: " + data);
 			rooms[lastIndex(socket.rooms)].currentTime = data;
-			console.log("currentTime in JSON = " + rooms[lastIndex(socket.rooms)].currentTime);
+			// console.log("currentTime in JSON = " + rooms[lastIndex(socket.rooms)].currentTime);
 		});
 
 		socket.on("sendFeedback", function(data){
