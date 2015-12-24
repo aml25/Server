@@ -10,8 +10,8 @@ var bodyParser = require('body-parser');
 var fs = require("fs");
 
 var io = require("socket.io")(server);
-var playMusic = require("playmusic");
-playMusic = new playMusic();
+
+var musicLibrary = require("musicLibrary.js");
 
 //set up headers for the server (not sure if this is really needed)
 app.use(function (req, res, next) {
@@ -35,6 +35,9 @@ app.use(express.static(__dirname + '/public/css'));
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 config = JSON.parse(fs.readFileSync("config.json"));
+
+musicLibrary.initLibrary(config); //start the Google Music server login/connection
+
 var rooms = {}; //this is a dummy for testing
 
 var emailServer = email.server.connect({
@@ -42,11 +45,6 @@ var emailServer = email.server.connect({
 	password: config.email.password,
 	host: "mail.name.com",
 	ssl: true
-});
-
-playMusic.init(config.playmusic, function(err, response){
-	if(err) console.error(err);
-	console.log("starting a google play music session");
 });
 
 app.get("/:id", function(req,res){
@@ -61,11 +59,10 @@ app.get("/track/:mp3", function(req,res){
 
 function getTrack(storeId, _callback){
 	var _callback = _callback //create a local copy of the callback for later functions
-	
-	playMusic.getStreamUrl(storeId, function(err, res){
-		var res = res; //create a local copy of the playMusic response for later functions
 
-		var file = fs.createWriteStream(__dirname + "/TuneFarmMusic/" + storeId + ".mp3");
+	var file = fs.createWriteStream(__dirname + "/TuneFarmMusic/" + storeId + ".mp3"); //create an empty file for the track
+
+	musicLibrary.getTrack(storeId, function(res){
 		var request = https.get(res, function(response) {
 			response.pipe(file);
 
@@ -123,84 +120,26 @@ function lastIndex(array){
 		});
 
 		//handle searching for something
-		socket.on("search", function(data){
+		socket.on("search", function(query){
 			console.log("got a search and I'm in room: " + lastIndex(socket.rooms));
-			console.log("request: search");
-			playMusic.search(data.query, 5, function(err, data){
-				var data = data.entries.sort(function(a, b) { // sort by match score
-					return a.score < b.score;
-				});
 
-				var artists = [];
-				var albums = [];
-				var tracks = [];
-
-				for(var i=0;i<data.length;i++){
-					switch(data[i].type){
-						case '1': //track
-							tracks.push(data[i].track);
-							break;
-						case '2': //artist
-							artists.push(data[i].artist);
-							break;
-						case '3': //album
-							albums.push(data[i].album);
-							break;
-					}
-				}
-
-				data = {
-					artists: artists,
-					albums: albums,
-					tracks: tracks
-				}
-
+			musicLibrary.search(query, function(data){
 				io.sockets.in(lastIndex(socket.rooms)).emit("searchResults", data);
-
-			})
+			});
 		});
 
 		//handle artist request
-		socket.on("getArtist", function(data){
-			console.log("request: get artist");
-			playMusic.getArtist(data.artistId, true, 4, 0, function(err, data){
-				var artists = [];
-				var albums = [];
-				var tracks = [];
-
-				artists.push(data);
-				albums = data.albums;
-				tracks = data.topTracks;
-
-				data = {
-					artists: artists,
-					albums: albums,
-					tracks: tracks
-				}
-				
+		socket.on("getArtist", function(query){			
+			musicLibrary.getArtist(query, function(data){
 				io.sockets.in(lastIndex(socket.rooms)).emit("artistResults", data);
 			});
 		});
 
 		//handle album request
-		socket.on("getAlbum", function(data){
-			console.log("request: get album");
-
-			playMusic.getAlbum(data.albumId, true, function(err, data){
-				var albums = [];
-				var tracks = [];
-
-				albums.push(data);
-				tracks = data.tracks;
-
-				data = {
-					artists: null,
-					albums: albums,
-					tracks: tracks
-				}
-
+		socket.on("getAlbum", function(query){
+			musicLibrary.getAlbum(query, function(data){
 				io.sockets.in(lastIndex(socket.rooms)).emit("albumResults", data);
-			})
+			});
 		});
 
 		socket.on("addTrackToPlaylist", function(data){
