@@ -5,3 +5,4 @@ _replicator/
 _users/
 pouch__all_dbs__/
 pouch__auth_sessions__/
+tunefarm/
