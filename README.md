@@ -3,7 +3,7 @@
 *Disclaimer
 - This is purely for experimentation.  Any stream grabbed from the `playmusic` library is strictly for testing purposes only and should never be stored.  This repo will drop Google Music as a source either upon request, or until ready for user testing.
 
-You need an "All Access" account with Google Music for this repo to function.  Also, you'll need to create a configuration file to get this running properly in the parent `Server/` folder called `config.json`.  The format of this file is below in the `Init Library` function description.
+You need an "All Access" account with Google Music for this repo to function.  Also, you'll need to create a configuration file to get this running properly in the parent `Server/` folder called `tunefarmconfig.json`.  The format of this file is below in the `Init Library` function description.
 
 
 Documentation
@@ -28,7 +28,7 @@ Init Library
 
 The function to start everything and authenticate an account with Google Play.  Please refer to [playmusic library by jamon](https://github.com/jamon/playmusic) for more info if needed.  It does not return anything.
 
-- `config.json` should be formatted like this
+- `tunefarmconfig.json` should be formatted like this
 
 	```
 	{
