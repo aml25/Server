@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(express.static(__dirname + '/public/TuneFarm'));
 //bring in the JS folder to the server to be used by all HTML pages
 app.use(express.static(__dirname + '/public/js'));
-//bring in the JS folder to the server to be used by all HTML pages
+//bring in the CSS folder to the server to be used by all HTML pages
 app.use(express.static(__dirname + '/public/css'));
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
