@@ -106,6 +106,12 @@
 		textarea{
 			resize:none;
 		}
+
+		.roomText{
+			font-size: 0.65rem;
+			opacity: 0.3;
+			margin-left:1rem;
+		}
 	</style>
 </head>
 <body>
@@ -113,6 +119,7 @@
 	<h1>Tune Farm
 		<audio controls src="" type="audio/mpeg"></audio>
 		<div id="feedback">Send feedback</div>
+		<div class="roomText"></div>
 	</h1>
 
 	<div id="audioControls">
@@ -219,8 +226,8 @@
 
 						}
 						else{
-							renameRoom("/"+value);
-							//broadcastRoom(true);
+							renameRoom(value);
+							broadcastRoom(true);
 						}
 					}
 				});
@@ -282,7 +289,7 @@
 		var socket = io.connect('http://localhost'); //initiate the socket
 
 		//INITIALIZE THE PAGE AND ROOM SETTINGS
-		joinRoom(("/"+((Math.random()*Math.random()*Math.random())/Math.random())).replace(".","")); //create some random unique ID.
+		joinRoom((""+((Math.random()*Math.random()*Math.random())/Math.random())).replace(".","")); //create some random unique ID.
 
 
 		/***SOCKET FUNCTIONS*******************************/
@@ -291,7 +298,9 @@
 		socket.on("joinRoomResults", function(data){
 			//history.pushState({}, null, data.room);
 			room = data.room;
-			isBroadcasting = data.liveState;
+			isBroadcasting = data['public'];
+
+			$(".roomText").text(room);
 		});
 
 		//handle search results from the server
@@ -378,7 +387,7 @@
 		        socket.emit("leaveRoom", "");
 		    }
 
-		    socket.emit("getPlaylist", ""); //just grab any existing playlist on the server (**for this broadcast, when it's implemented**)
+		    socket.emit("getPlaylist", ""); //on page load, grab the existing playlist for this room
 
 		    socket.emit("getBroadcastRooms", ""); //on page load, grab existing rooms
 		}
@@ -519,7 +528,7 @@
 
 			for(var i=0;i<data.length;i++){
 				$broadcast = "<details> \
-					<summary><a href='"+data[i].roomDetails.roomName+"'>"+data[i].roomDetails.roomName+"</a></summary>\
+					<summary><a href='"+data[i].room+"'>"+data[i].room+"</a></summary>\
 					</details>";
 
 				$("#broadcasts #broadcastsList").append($broadcast);
@@ -528,14 +537,13 @@
 					var $p = "<p>"+data[i].tracks[u].trackData.artist+" - "+data[i].tracks[u].trackData.title+"</p>";
 					$("#broadcasts #broadcastsList details").last().append($p);
 				}
-				
 			}
 		}
 
 		function drawPlaylistResults(data){
 			$("#playlist #myPlaylist").empty();
 			playlist = data;
-			//console.log(playlist);
+
 			for(var u=0;u<data.tracks.length;u++){
 				var $p = $("<p>"+data.tracks[u].trackData.artist+" - "+data.tracks[u].trackData.title+"</p>");
 				$p.data({trackIndex: u});

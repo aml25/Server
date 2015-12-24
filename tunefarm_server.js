@@ -54,27 +54,32 @@ app.get("/track/:mp3", function(req,res){
 	res.sendFile(trackPath);
 });
 
-function getTrack(storeId, _callback){
-	var _callback = _callback //create a local copy of the callback for later functions
-
+//make an HTTP request to stream the remote URL to a local file created above
+function storeTrack(storeId, url, _callback){
 	var file = fs.createWriteStream(__dirname + "/TuneFarmMusic/" + storeId + ".mp3"); //create an empty file for the track
 
-	musicLibrary.getTrack(storeId, function(res){
-		var request = https.get(res, function(response) {
-			response.pipe(file);
-
-			_callback();
-		});
+	var request = https.get(url, function(response) {
+		response.pipe(file);
+		_callback();
 	});
 }
 
 
 /***HANDLE SOCKET COMMUNICATION*****************************************************************/
 io.sockets.on("connection", function(socket){
+	//handle joining a room
 	socket.on("joinRoom", function(room){
 		if(socket.room == undefined){
 			//this is the first room a user is joining
 			console.log("I've never been in a room before...");
+		}
+		else{
+			console.log("I'm already in a room, so let's leave that one first");
+			//check against the database and remove the room if it's empty
+			pouch.checkRoomStatus(socket.room, function(status){
+				console.log("room is alive? " + status);
+			})
+			socket.leave(socket.room);
 		}
 
 		socket.join(room);
@@ -86,12 +91,18 @@ io.sockets.on("connection", function(socket){
 		pouch.joinRoom(socket.room, function(data){
 			console.log("joining room");
 			console.log(JSON.stringify(data, null, 4));
-			socket.emit("joinRoomResults", data);
+			//send to the client making the request
+			socket.emit("joinRoomResults", data); //return the entire room "document" to the client
 		});
 	});
 
+	//handle renaming a room
 	socket.on("renameRoom", function(room){
 		var oldRoom = socket.room;
+		//check against the database and remove the old room it it's empty
+		pouch.checkRoomStatus(socket.room, function(status){
+			console.log("room is alive? " + status);
+		})
 		socket.leave(oldRoom);
 		socket.join(room);
 		socket.room = room;
@@ -100,13 +111,15 @@ io.sockets.on("connection", function(socket){
 		pouch.renameRoom({oldRoom: oldRoom, room: socket.room}, function(data){
 			console.log("renaming room");
 			console.log(JSON.stringify(data, null, 4));
-			socket.emit("joinRoomResults", data); //join the new room on the client-side - use the same socket message
+			//send to the client making the request
+			socket.emit("joinRoomResults", data); //join the new room on the client-side - use the same socket message --- send the whole room "document" to the client
 		});
 	});
 
 	//handle searching for something
 	socket.on("search", function(query){
 		musicLibrary.search(query, function(data){
+			//send to the client making the request
 			socket.emit("searchResults", data);
 		});
 	});
@@ -114,6 +127,7 @@ io.sockets.on("connection", function(socket){
 	//handle artist request
 	socket.on("getArtist", function(query){			
 		musicLibrary.getArtist(query, function(data){
+			//send to the client making the request
 			socket.emit("artistResults", data);
 		});
 	});
@@ -121,10 +135,98 @@ io.sockets.on("connection", function(socket){
 	//handle album request
 	socket.on("getAlbum", function(query){
 		musicLibrary.getAlbum(query, function(data){
+			//send to the client making the request
 			socket.emit("albumResults", data);
 		});
 	});
+
+	//handle request to add a track to playlist
+	socket.on("addTrackToPlaylist", function(data){
+		var trackData = data; //save a local copy of the track data for later use
+
+		var file = fs.createWriteStream(__dirname + "/TuneFarmMusic/" + trackData.storeId + ".mp3"); //create an empty file for the track		
+
+		musicLibrary.getTrack(trackData.storeId, function(url){
+			storeTrack(trackData.storeId, url, function(){
+				//add the track to the room's database (document)
+				pouch.addTrackToPlaylist(socket.room, trackData, "/track/" + trackData.storeId + ".mp3", function(data){
+					//send room data to all clients in the room, including *this* client
+					io.sockets.in(socket.room).emit("playlistResults", data);
+				});
+			});
+		});
+	});
+
+	//handle a get playlist request
+	socket.on("getPlaylist", function(){
+		pouch.getPlaylist(socket.room, function(data){
+			//send to client making the request
+			socket.emit("playlistResults", data);
+		});
+	});
+
+	//handle a play track request
+	socket.on("playTrack", function(data){
+		data.isPlaying = true;
+		pouch.updateState(socket.room, data, function(data){
+			//send room data to all the clients in the room
+			io.sockets.in(socket.room).emit("playTrackResults", data);
+		});
+	});
+
+	//handle a pause track request
+	socket.on("pauseTrack", function(){
+		pouch.updateState(socket.room, {isPlaying: false}, function(data){
+			//send update to all clients in the room
+			io.sockets.in(socket.room).emit("pauseTrackResults", "");
+		});
+	});
+
+	socket.on("getBroadcastRooms", function(){
+		pouch.returnLiveRooms(function(liveRooms){
+			//send to ALL clients connected to the server since this is a global list for the public
+			io.sockets.emit("broadcastRoomResults", liveRooms);
+		});
+	});
+
+	socket.on("broadcastRoom", function(state){
+		pouch.updateState(socket.room, {"public": state}, function(data){
+			pouch.returnLiveRooms(function(liveRooms){
+				//send to ALL clients connected to the server since this is a global list for the public
+				io.sockets.emit("broadcastRoomResults", liveRooms);
+			});
+		});
+	});
+	
+	//handle the time interval from clients for updating track time as a track is playing
+	socket.on("updateCurrentTime", function(currTrackTime){
+		pouch.updateState(socket.room, {currTrackTime: currTrackTime}, function(data){
+			//do something?
+		});
+	});
+
+	//send feedback results from client to given email.
+	socket.on("sendFeedback", function(data){
+		emailServer.send({
+			text:    data.body, 
+			from:    data.email, 
+			to:      config.email.email,
+			subject: "::feedback::"
+		}, function(err, message) { console.log(err || message); });
+	});
+
+	//handle the disconnection of a client
+	socket.on('disconnect', function() {
+		console.log('Got disconnect!');
+
+		pouch.checkRoomStatus(socket.room, function(status){
+			console.log("room is alive? " + status);
+		});
+	});
 });
+
+
+
 
 
 
