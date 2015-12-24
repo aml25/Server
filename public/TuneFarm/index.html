@@ -181,6 +181,8 @@
 
 		var isBroadcasting = false;
 
+		var room;
+
 		$("#playPause").click(function(){
 			if(!isPlaying){
 				emitPlayTrack();
@@ -214,11 +216,11 @@
 					],
 					callback: function(value) {
 						if(value == false){
-							broadcastRoom(false);
+
 						}
 						else{
-							joinRoom("/"+value);
-							broadcastRoom(true);
+							renameRoom("/"+value);
+							//broadcastRoom(true);
 						}
 					}
 				});
@@ -251,7 +253,7 @@
 					socket.emit("sendFeedback", data);
 				}
 			});
-		})
+		});
 
 		audioElement[0].onended = function(){
 			playNextTrack();
@@ -277,23 +279,19 @@
 		});
 
 
+		var socket = io.connect('http://localhost'); //initiate the socket
+
+		//INITIALIZE THE PAGE AND ROOM SETTINGS
+		joinRoom(("/"+((Math.random()*Math.random()*Math.random())/Math.random())).replace(".","")); //create some random unique ID.
+
 
 		/***SOCKET FUNCTIONS*******************************/
-		var socket = io('http://localhost'); //initiate the socket
-
-		//load the room//
-        if(window.location.pathname == "/"){
-        	joinRoom(("/"+Math.random()*Math.random()*Math.random())/Math.random());
-        }
-        else{
-        	joinRoom(window.location.pathname);
-        }
-        /////////////////
 
 		//handle the result of joining a room from the server.  basically - if the connection to the server was made at root level, push to the URL the unique room name to keep track of URLs and rooms for the servers purpose
 		socket.on("joinRoomResults", function(data){
-			history.pushState({}, null, data.roomDetails.roomName);
-			isBroadcasting = data.roomDetails.liveState;
+			//history.pushState({}, null, data.room);
+			room = data.room;
+			isBroadcasting = data.liveState;
 		});
 
 		//handle search results from the server
@@ -324,10 +322,10 @@
 
 			drawPlaylistResults(playlist);
 
-			currTrackIndex = data.currentTrack;
+			currTrackIndex = data.currTrackIndex;
 
 			if(data.isPlaying){
-				playTrack(data.currentTime);
+				playTrack(data.currTrackTime);
 			}
 
 			/*if(audioElement.attr("src")==""){
@@ -342,11 +340,11 @@
 
 		//signal from server to start playing a track on the client... could have come from THIS client or from a another client that THIS client is connected to
 		socket.on("playTrackResults", function(data){
-			currTrackIndex = data.currentTrack;
+			currTrackIndex = data.currTrackIndex;
 
 			console.log("playing: " + playlist.tracks[currTrackIndex].trackData.artist + " - " + playlist.tracks[currTrackIndex].trackData.title);
 
-			playTrack(data.currentTime);
+			playTrack(data.currTrackTime);
 
 			//make the current track in the playlist "playing"
 			$($("#myPlaylist").children()[currTrackIndex]).addClass("playing");
@@ -372,7 +370,7 @@
 
 		
 
-		//the main room handler function
+		/***THE MAIN CLIENT-SIDE ROOM HANDLER FUNCTIONS*************/
 		function joinRoom(roomId){
 		    socket.emit("joinRoom", roomId);
 
@@ -384,6 +382,11 @@
 
 		    socket.emit("getBroadcastRooms", ""); //on page load, grab existing rooms
 		}
+
+		function renameRoom(roomId){
+			socket.emit("renameRoom", roomId);
+		}
+		/*************THE MAIN CLIENT-SIDE ROOM HANDLER FUNCTIONS***/
 
 
 
