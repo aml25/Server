@@ -58,6 +58,7 @@ app.get("/track/:mp3", function(req,res){
 function storeTrack(storeId, url, _callback){
 	var file = fs.createWriteStream(__dirname + "/TuneFarmMusic/" + storeId + ".mp3"); //create an empty file for the track
 
+	console.log("starting a file stream");
 	var request = https.get(url, function(response) {
 		response.pipe(file);
 		_callback();
@@ -90,7 +91,6 @@ io.sockets.on("connection", function(socket){
 		//pouch module
 		pouch.joinRoom(socket.room, function(data){
 			console.log("joining room");
-			console.log(JSON.stringify(data, null, 4));
 			//send to the client making the request
 			socket.emit("joinRoomResults", data); //return the entire room "document" to the client
 		});
@@ -110,8 +110,7 @@ io.sockets.on("connection", function(socket){
 		//pouch module
 		pouch.renameRoom({oldRoom: oldRoom, room: socket.room}, function(data){
 			console.log("renaming room");
-			console.log(JSON.stringify(data, null, 4));
-			//send to the client making the request
+			// --> send to the client making the request - at some point this should be synced across all clients
 			socket.emit("joinRoomResults", data); //join the new room on the client-side - use the same socket message --- send the whole room "document" to the client
 		});
 	});
@@ -208,8 +207,8 @@ io.sockets.on("connection", function(socket){
 	//send feedback results from client to given email.
 	socket.on("sendFeedback", function(data){
 		emailServer.send({
-			text:    data.body, 
-			from:    data.email, 
+			text:    data.body,
+			from:    data.email,
 			to:      config.email.email,
 			subject: "::feedback::"
 		}, function(err, message) { console.log(err || message); });
