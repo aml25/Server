@@ -1,0 +1,147 @@
+html,body{
+	font-size: 12px;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 400;
+	margin:0px;
+}
+
+
+section{
+	margin:2rem;
+}
+
+ul{
+	margin:2rem;
+}
+
+li{
+	cursor: pointer;
+}
+
+li:hover{
+	background-color:#8AE859;
+}
+
+p{
+	white-space: nowrap;
+	text-overflow: ellipsis;     /** IE6+, Firefox 7+, Opera 11+, Chrome, Safari **/
+	-o-text-overflow: ellipsis;  /** Opera 9 & 10 **/
+	overflow:hidden;
+}
+
+p:hover{
+	background-color:#8AE859;
+}
+
+.playing{
+	background-color:#8AE859;
+}
+
+/*#audioControls{
+	float:right;
+}*/
+span{
+	margin-right: 6px;
+}
+
+#currentTrack, #currentTime{
+	vertical-align: top;
+}
+
+#currentTime{
+	color: #bababa;
+}
+
+img{
+	width:1.5rem;
+}
+
+audio{
+	float:right;
+	display:none;
+}
+
+.description{
+	color:#8AE859;
+}
+
+#feedback{
+	  font-size: 1rem;
+	  float: right;
+	  font-weight: normal;
+	  margin-top:0.9rem;
+}
+
+textarea{
+	resize:none;
+}
+
+/*new interface*/
+
+#roomName{
+	opacity:0.5;
+	font-size: 1.25rem;
+}
+
+.button{
+	border: none;
+    border-radius: 1.625rem;
+    width:3.25rem;
+    height:3.25rem;
+    background-color: #ddd;
+    display:inline-block;
+}
+
+.button img{
+	margin-top:0.8125rem;
+	margin-left:0.8125rem;
+}
+
+.button.selected{
+	background-color:#D10069;
+}
+
+#menu{
+	position:fixed;
+	right:0px;
+	bottom:0px;
+	margin:1rem;
+	max-width: 3rem;
+}
+
+#menu .button{
+	margin-top:0.75rem;
+}
+
+.absolute{
+	position:absolute;
+}
+
+h1{
+	padding:0.75rem;
+	margin:0 0 .333rem 0;
+	background-color: #eee;
+}
+
+h2{
+	margin:0;
+}
+
+input{
+	width:100%;
+	font-size:1.5rem;
+	padding:0.5rem 0.5rem 0.5rem 1rem;
+	border:1px solid;
+	border-color: #aaa;
+	border-radius:0.25rem;
+}
+
+main{
+	display:none;
+	margin:1rem 1.5rem 1rem 1.5rem;
+	height: calc(100% - 6rem);
+}
+
+
+
+
