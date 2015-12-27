@@ -148,6 +148,9 @@ io.sockets.on("connection", function(socket){
 		musicLibrary.getTrack(trackData.storeId, function(url){
 			storeTrack(trackData.storeId, url, function(){
 				//add the track to the room's database (document)
+
+				console.log("the track is down downloading");
+
 				pouch.addTrackToPlaylist(socket.room, trackData, "/track/" + trackData.storeId + ".mp3", function(data){
 					//send room data to all clients in the room, including *this* client
 					io.sockets.in(socket.room).emit("playlistResults", data);
