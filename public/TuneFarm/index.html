@@ -33,9 +33,9 @@
 	<div id="headerContainer">
 		<h1>Tune Farm</h1>
 		<div id="menu">
-			<div class="button selected" data-view="search"><img src="/img/search-01.png"></div>
-			<div class="button" data-view="playlist"><img src="/img/playlist-01.png"></div>
-			<div class="button" data-view="broadcasts"><img src="/img/broadcast-01.png"></div>
+			<div class="button selected" data-view="search"><img src="/img/search.png"></div>
+			<div class="button" data-view="playlist"><img src="/img/playlist.png"></div>
+			<div class="button" data-view="broadcasts"><img src="/img/broadcast.png"></div>
 		</div>
 	</div>
 	<audio controls src="" type="audio/mpeg"></audio>
@@ -78,7 +78,7 @@
 	<script type="text/javascript">
 
 		/*new interface*/
-		var socket = io.connect('http://192.168.1.101'); //initiate the socket
+		var socket = io.connect('http://localhost'); //initiate the socket
 		var draw = new Draw();
 
 		var audioElement = $("audio");
