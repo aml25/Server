@@ -44,7 +44,7 @@ Draw.prototype.drawSearchResults = function(data){
 			<tr> \
 				<td id="albumArt" rowspan="2"></td> \
 				<td id="trackTitle"></td> \
-				<td id="buttons" rowspan="2"><div class="button" data-action="add"><img src="/img/addtrack-01.png"></div></td> \
+				<td id="buttons" rowspan="2"><div class="button" data-action="add"><img src="/img/addtrack.svg"></div></td> \
 			</tr> \
 			<tr> \
 				<td id="artistTitle"></td> \
@@ -69,7 +69,7 @@ Draw.prototype.drawSearchResults = function(data){
 
 			$(this).unbind();
 
-			$(this).children("img").attr("src", "/img/removetrack-01.png");
+			$(this).children("img").attr("src", "/img/removetrack.svg");
 		});
 
 		$("#tracks").append($div);
@@ -85,7 +85,7 @@ Draw.prototype.drawPlaylistResults = function(data){
 			<tr> \
 				<td id="albumArt" rowspan="2"></td> \
 				<td id="trackTitle"></td> \
-				<td id="buttons" rowspan="2"><div class="button" data-action="remove"><img src="/img/removetrack-01.png"></div></td> \
+				<td id="buttons" rowspan="2"><div class="button" data-action="remove"><img src="/img/removetrack.svg"></div></td> \
 			</tr> \
 			<tr> \
 				<td id="artistTitle"></td> \
